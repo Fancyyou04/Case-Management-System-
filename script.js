@@ -34,8 +34,22 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  caseForm?.addEventListener("submit", function (e) {
+caseForm?.addEventListener("submit", function (e) {
   e.preventDefault();
+
+  const newInvestigator = newInvestigatorInput.value.trim();
+  const newOldInvestigator = newOldInvestigatorInput.value.trim();
+  const finalInvestigator = newInvestigator || investigatorSelect.value;
+  const finalOldInvestigator = newOldInvestigator || oldInvestigatorSelect.value;
+
+  if (finalInvestigator && !investigators.includes(finalInvestigator)) {
+    investigators.push(finalInvestigator);
+  }
+  if (finalOldInvestigator && !investigators.includes(finalOldInvestigator)) {
+    investigators.push(finalOldInvestigator);
+  }
+  localStorage.setItem("investigators", JSON.stringify(investigators));
+  loadInvestigators();
 
   const data = {
     receivedDate: document.getElementById("receivedDate").value,
@@ -44,21 +58,12 @@ document.addEventListener("DOMContentLoaded", function () {
     charge: document.getElementById("charge").value,
     victim: document.getElementById("victim").value,
     suspect: document.getElementById("suspect").value,
-    investigator: investigatorSelect.value,
-    oldInvestigator: oldInvestigatorSelect.value,
+    investigator: finalInvestigator,
+    oldInvestigator: finalOldInvestigator,
     handoverDate: document.getElementById("handoverDate").value,
     returnDate: document.getElementById("returnDate").value,
     returnTime: document.getElementById("returnTime").value
   };
-
-  if (data.investigator && !investigators.includes(data.investigator)) {
-    investigators.push(data.investigator);
-  }
-  if (data.oldInvestigator && !investigators.includes(data.oldInvestigator)) {
-    investigators.push(data.oldInvestigator);
-  }
-  localStorage.setItem("investigators", JSON.stringify(investigators));
-  loadInvestigators();
 
   const editingIndex = caseForm.getAttribute("data-editing");
   if (editingIndex !== null) {
@@ -69,7 +74,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   localStorage.setItem("caseList", JSON.stringify(caseList));
+
   caseForm.reset();
+  newInvestigatorInput.value = "";
+  newOldInvestigatorInput.value = "";
+
   renderTable(searchInput?.value.trim() || "");
 });
 
