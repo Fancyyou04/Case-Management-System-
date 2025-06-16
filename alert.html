@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>แจ้งเตือนสำนวนใกล้ครบกำหนด</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>สำนวนที่ต้องส่งให้อัยการในอีก 3 วัน</h2>
+    <a href="index.html" class="back-link">← กลับไปหน้าหลัก</a>
+    <div id="alertCases"></div>
+  </div>
+
+  <script>
+    const caseList = JSON.parse(localStorage.getItem("caseList")) || [];
+    const container = document.getElementById("alertCases");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    caseList.forEach((item) => {
+      if (!item.returnDate) return;
+
+      const returnDate = new Date(item.returnDate);
+      returnDate.setHours(0, 0, 0, 0);
+      const timeDiff = (returnDate - today) / (1000 * 60 * 60 * 24);
+
+      if (timeDiff >= 0 && timeDiff <= 3) {
+        const card = document.createElement("div");
+        card.className = "case-card";
+
+        card.innerHTML = `
+          <h3>รหัสคดี: ${item.caseCode}</h3>
+          <p><strong>วันที่รับ:</strong> ${item.receivedDate} เวลา ${item.receivedTime}</p>
+          <p><strong>ผู้ต้องหา:</strong> ${item.suspect}</p>
+          <p><strong>ผู้เสียหาย:</strong> ${item.victim}</p>
+          <p><strong>ฐานความผิด:</strong> ${item.charge}</p>
+          <p><strong>พนักงานสอบสวนที่รับมอบสำนวน:</strong> ${item.investigator}</p>
+          <p><strong>วันที่ต้องส่งให้อัยการ:</strong> <span class="danger">${item.returnDate}</span> เวลา ${item.returnTime || "-"}</p>
+        `;
+        container.appendChild(card);
+      }
+    });
+  </script>
+</body>
+</html>

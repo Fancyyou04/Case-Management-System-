@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>สำนวนที่ยังไม่ส่งคืนให้อัยการ</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .top-bar {
+      text-align: right;
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #444;
+    }
+    .case-card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      background-color: #f9f9f9;
+    }
+    .card-actions {
+      text-align: right;
+      margin-bottom: 8px;
+    }
+    .danger-link {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>สำนวนที่ยังไม่ส่งคืนให้อัยการ</h2>
+    <a href="index.html" class="back-link">← กลับหน้าหลัก</a>
+
+    <div class="top-bar">
+      <span id="unsentCount">จำนวนสำนวนที่ยังไม่ส่งคืน: 0 คดี</span>
+    </div>
+
+    <input type="text" id="searchInput" placeholder="ค้นหา เช่น รหัสคดี ผู้ต้องหา พนักงานสอบสวน ฯลฯ" />
+    <p id="notFoundMsg" style="color:red; display:none;">ไม่พบข้อมูล</p>
+
+    <div id="unsentCases"></div>
+
+    <script>
+      const caseList = JSON.parse(localStorage.getItem("caseList")) || [];
+      const container = document.getElementById("unsentCases");
+      const unsentCount = document.getElementById("unsentCount");
+      const searchInput = document.getElementById("searchInput");
+      const notFoundMsg = document.getElementById("notFoundMsg");
+
+      function renderUnsentCases(filter = "") {
+        container.innerHTML = "";
+        notFoundMsg.style.display = "none";
+
+        const keywords = filter.toLowerCase().split(/\s+/);
+
+        const unsent = caseList.filter((item) => {
+          const isUnsent = (!item.returnDate || !item.returnTime); // ✅ ยังไม่ส่ง
+
+          if (!isUnsent) return false;
+
+          const allText = `
+            ${item.caseCode} ${item.receivedDate} ${item.receivedTime}
+            ${item.suspect} ${item.victim} ${item.charge}
+            ${item.investigator} ${item.oldInvestigator}
+          `.toLowerCase();
+
+          return keywords.every(word => allText.includes(word));
+        });
+
+        unsentCount.textContent = `จำนวนสำนวนที่ยังไม่ส่งคืน: ${unsent.length} คดี`;
+
+        if (unsent.length === 0) {
+          notFoundMsg.style.display = "block";
+          return;
+        }
+
+        unsent.forEach((item, index) => {
+          const card = document.createElement("div");
+          card.className = "case-card";
+
+          card.innerHTML = `
+            <div class="card-actions">
+              <a href="#" onclick="editCase(${caseList.indexOf(item)})">แก้ไข</a> |
+              <a href="#" onclick="deleteCase(${caseList.indexOf(item)})" class="danger-link">ลบ</a>
+            </div>
+            <h3>รหัสคดี: ${item.caseCode}</h3>
+            <p><strong>วันที่รับ:</strong> ${item.receivedDate} เวลา ${item.receivedTime}</p>
+            <p><strong>ผู้ต้องหา:</strong> ${item.suspect}</p>
+            <p><strong>ผู้เสียหาย:</strong> ${item.victim}</p>
+            <p><strong>ฐานความผิด:</strong> ${item.charge}</p>
+            <p><strong>พนักงานสอบสวน:</strong> ${item.investigator}</p>
+            <p><strong>พนักงานสอบสวนคดีเดิม:</strong> ${item.oldInvestigator}</p>
+            <p><strong>วันที่ต้องส่งคืน:</strong> ${item.returnDate || "-"} เวลา ${item.returnTime || "-"}</p>
+          `;
+          container.appendChild(card);
+        });
+      }
+
+      function editCase(index) {
+        localStorage.setItem("editIndex", index);
+        window.location.href = "index.html";
+      }
+
+      function deleteCase(index) {
+        if (confirm("คุณแน่ใจว่าต้องการลบข้อมูลนี้?")) {
+          caseList.splice(index, 1);
+          localStorage.setItem("caseList", JSON.stringify(caseList));
+          renderUnsentCases(searchInput.value.trim());
+        }
+      }
+
+      searchInput.addEventListener("input", () => {
+        renderUnsentCases(searchInput.value.trim());
+      });
+
+      renderUnsentCases();
+    </script>
+  </div>
+</body>
+</html>

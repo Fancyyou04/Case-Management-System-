@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>บันทึกสำนวน</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>บันทึกข้อมูลสำนวน</h1>
+    <form id="caseForm">
+      <label>วันที่รับสำนวนจากอัยการ</label>
+      <input type="date" id="receivedDate" required>
+
+      <label>เวลาที่รับสำนวน</label>
+      <input type="time" id="receivedTime">
+
+      <label>รหัสคดี/พ.ศ</label>
+      <input type="text" id="caseCode" required>
+
+      <label>ฐานที่หาว่ากระทำผิด</label>
+      <input type="text" id="charge" required>
+
+      <label>ชื่อผู้เสียหาย</label>
+      <input type="text" id="victim" required>
+
+      <label>ชื่อผู้ต้องหา</label>
+      <input type="text" id="suspect" required>
+
+      <label>ชื่อพนักงานสอบสวนที่รับมอบสำนวน</label>
+      <select id="investigator">
+        <option value="">-- กรุณาเลือก --</option>
+      </select>
+      <input type="text" id="newInvestigator" placeholder="เพิ่มชื่อใหม่ (กด Enter)">
+
+      <label>พนักงานสอบสวนคดีเดิม</label>
+      <select id="oldInvestigatorSelect">
+        <option value="">-- กรุณาเลือก --</option>
+      </select>
+      <input type="text" id="newOldInvestigator" placeholder="เพิ่มชื่อใหม่ (กด Enter)">
+
+      <label>วันที่ส่งมอบสำนวนให้พนักงานสอบสวน</label>
+      <input type="date" id="handoverDate">
+
+      <label>วันที่ส่งคืนสำนวนให้อัยการ</label>
+      <input type="date" id="returnDate">
+
+      <label>เวลาที่ส่งคืนสำนวนให้อัยการ</label>
+      <input type="time" id="returnTime">
+
+      <button type="submit">บันทึกข้อมูล</button>
+    </form>
+
+    <hr>
+
+    <h2>รายการสำนวนล่าสุด</h2>
+
+    <!-- 🔍 ช่องค้นหา -->
+    <input type="text" id="searchInput" placeholder="ค้นหาทุกข้อมูล เช่น รหัสคดี ชื่อผู้ต้องหา พนักงานสอบสวน ฯลฯ" />
+    <p id="notFoundMsg" style="color: red; display: none;">ไม่พบข้อมูล</p>
+
+    <div id="caseTable"></div>
+
+    <br>
+    <a href="list.html" class="back-link">→ ไปยังหน้ารายการสำนวนทั้งหมด</a><br>
+    <a href="alert.html" class="back-link">→ ดูสำนวนที่ใกล้ถึงกำหนดส่งใน 3 วัน</a><br>
+    <a href="unsent.html" class="btn-orange">🕒 ดูสำนวนที่ยังไม่ส่งคืนให้อัยการ</a>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>รายการสำนวนทั้งหมด</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .top-bar {
+      text-align: right;
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #444;
+    }
+    .right-link {
+      text-align: right;
+      margin-bottom: 10px;
+    }
+    .btn-orange {
+      background-color: #ff9800;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      display: inline-block;
+      transition: background 0.3s;
+    }
+    .btn-orange:hover {
+      background-color: #e68900;
+    }
+    .case-card {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      background-color: #f9f9f9;
+    }
+    .card-actions {
+      text-align: right;
+      margin-bottom: 8px;
+    }
+    .danger-link {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>รายการสำนวนทั้งหมด</h2>
+    <a href="index.html" class="back-link">← กลับไปหน้าหลัก</a>
+
+    <!-- 🔶 ปุ่ม "ยังไม่ส่งคืน" มุมขวา -->
+    <div class="right-link">
+      <a href="unsent.html" class="btn-orange">🕒 ดูสำนวนที่ยังไม่ส่งคืนให้อัยการ</a>
+    </div>
+
+    <!-- 🔢 แสดงจำนวนคดี -->
+    <div class="top-bar">
+      <span id="totalCount">จำนวนสำนวนทั้งหมด: 0 คดี</span>
+    </div>
+
+    <input type="text" id="searchInput" placeholder="ค้นหาทุกช่อง เช่น รหัสคดี ผู้ต้องหา พนักงานสอบสวน ฯลฯ" />
+    <p id="notFoundMsg" style="color: red; display: none;">ไม่พบข้อมูล</p>
+
+    <div id="allCases"></div>
+  </div>
+
+  <script>
+    const caseList = JSON.parse(localStorage.getItem("caseList")) || [];
+    const container = document.getElementById("allCases");
+    const searchInput = document.getElementById("searchInput");
+    const notFoundMsg = document.getElementById("notFoundMsg");
+    const totalCount = document.getElementById("totalCount");
+
+    function renderCases(filter = "") {
+      container.innerHTML = "";
+      notFoundMsg.style.display = "none";
+
+      const keywords = filter.toLowerCase().split(/\s+/);
+
+      const filteredCases = caseList.filter(item => {
+        const allText = `
+          ${item.caseCode} ${item.receivedDate} ${item.receivedTime}
+          ${item.returnDate} ${item.returnTime} ${item.suspect}
+          ${item.victim} ${item.charge} ${item.investigator}
+          ${item.oldInvestigator} ${item.handoverDate}
+        `.toLowerCase();
+        return keywords.every(word => allText.includes(word));
+      });
+
+      totalCount.textContent = `จำนวนสำนวนทั้งหมด: ${filteredCases.length} คดี`;
+
+      if (filteredCases.length === 0) {
+        notFoundMsg.style.display = "block";
+        return;
+      }
+
+      filteredCases.forEach((item, index) => {
+        const card = document.createElement("div");
+        card.className = "case-card";
+
+        const today = new Date();
+        const dueDate = new Date(item.returnDate);
+        const diff = (dueDate - today) / (1000 * 60 * 60 * 24);
+        let warning = "";
+        if (diff >= 0 && diff <= 3) {
+          warning = `<p style="color: red;"><strong>⚠️ เหลือ ${Math.ceil(diff)} วันก่อนส่งสำนวน</strong></p>`;
+        }
+
+        card.innerHTML = `
+          <div class="card-actions">
+            <a href="#" onclick="editCase(${index})">แก้ไข</a> |
+            <a href="#" onclick="deleteCase(${index})" class="danger-link">ลบ</a>
+          </div>
+          <h3>รหัสคดี: ${item.caseCode}</h3>
+          <p><strong>วันที่รับ:</strong> ${item.receivedDate} เวลา ${item.receivedTime}</p>
+          <p><strong>ผู้ต้องหา:</strong> ${item.suspect}</p>
+          <p><strong>ผู้เสียหาย:</strong> ${item.victim}</p>
+          <p><strong>ฐานความผิด:</strong> ${item.charge}</p>
+          <p><strong>พนักงานสอบสวน:</strong> ${item.investigator}</p>
+          <p><strong>พนักงานสอบสวนคดีเดิม:</strong> ${item.oldInvestigator}</p>
+          <p><strong>วันที่ส่งมอบ:</strong> ${item.handoverDate || "-"}</p>
+          <p><strong>วันที่ต้องส่งคืน:</strong> ${item.returnDate || "-"} เวลา ${item.returnTime || "-"}</p>
+          ${warning}
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function editCase(index) {
+      localStorage.setItem("editIndex", index);
+      window.location.href = "index.html";
+    }
+
+    function deleteCase(index) {
+      if (confirm("คุณแน่ใจว่าต้องการลบข้อมูลนี้?")) {
+        caseList.splice(index, 1);
+        localStorage.setItem("caseList", JSON.stringify(caseList));
+        renderCases(searchInput.value.trim());
+      }
+    }
+
+    searchInput.addEventListener("input", () => {
+      renderCases(searchInput.value.trim());
+    });
+
+    renderCases();
+  </script>
+</body>
+</html>
