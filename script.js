@@ -51,6 +51,15 @@ document.addEventListener("DOMContentLoaded", function () {
       returnTime: document.getElementById("returnTime").value
     };
 
+    if (data.investigator && !investigators.includes(data.investigator)) {
+    investigators.push(data.investigator);
+  }
+    if (data.oldInvestigator && !investigators.includes(data.oldInvestigator)) {
+      investigators.push(data.oldInvestigator);
+    }
+    localStorage.setItem("investigators", JSON.stringify(investigators));
+    loadInvestigators();
+    
     const editingIndex = caseForm.getAttribute("data-editing");
     if (editingIndex !== null) {
       caseList[editingIndex] = data;
