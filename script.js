@@ -35,43 +35,44 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   caseForm?.addEventListener("submit", function (e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    const data = {
-      receivedDate: document.getElementById("receivedDate").value,
-      receivedTime: document.getElementById("receivedTime").value,
-      caseCode: document.getElementById("caseCode").value,
-      charge: document.getElementById("charge").value,
-      victim: document.getElementById("victim").value,
-      suspect: document.getElementById("suspect").value,
-      investigator: investigatorSelect.value,
-      oldInvestigator: oldInvestigatorSelect.value,
-      handoverDate: document.getElementById("handoverDate").value,
-      returnDate: document.getElementById("returnDate").value,
-      returnTime: document.getElementById("returnTime").value
-    };
+  const data = {
+    receivedDate: document.getElementById("receivedDate").value,
+    receivedTime: document.getElementById("receivedTime").value,
+    caseCode: document.getElementById("caseCode").value,
+    charge: document.getElementById("charge").value,
+    victim: document.getElementById("victim").value,
+    suspect: document.getElementById("suspect").value,
+    investigator: investigatorSelect.value,
+    oldInvestigator: oldInvestigatorSelect.value,
+    handoverDate: document.getElementById("handoverDate").value,
+    returnDate: document.getElementById("returnDate").value,
+    returnTime: document.getElementById("returnTime").value
+  };
 
-    if (data.investigator && !investigators.includes(data.investigator)) {
+  if (data.investigator && !investigators.includes(data.investigator)) {
     investigators.push(data.investigator);
   }
-    if (data.oldInvestigator && !investigators.includes(data.oldInvestigator)) {
-      investigators.push(data.oldInvestigator);
-    }
-    localStorage.setItem("investigators", JSON.stringify(investigators));
-    loadInvestigators();
-    
-    const editingIndex = caseForm.getAttribute("data-editing");
-    if (editingIndex !== null) {
-      caseList[editingIndex] = data;
-      caseForm.removeAttribute("data-editing");
-    } else {
-      caseList.push(data);
-    }
+  if (data.oldInvestigator && !investigators.includes(data.oldInvestigator)) {
+    investigators.push(data.oldInvestigator);
+  }
+  localStorage.setItem("investigators", JSON.stringify(investigators));
+  loadInvestigators();
 
-    localStorage.setItem("caseList", JSON.stringify(caseList));
-    caseForm.reset();
-    renderTable(searchInput?.value.trim() || "");
-  });
+  const editingIndex = caseForm.getAttribute("data-editing");
+  if (editingIndex !== null) {
+    caseList[editingIndex] = data;
+    caseForm.removeAttribute("data-editing");
+  } else {
+    caseList.push(data);
+  }
+
+  localStorage.setItem("caseList", JSON.stringify(caseList));
+  caseForm.reset();
+  renderTable(searchInput?.value.trim() || "");
+});
+
 
   window.editCase = function (index) {
     const c = caseList[index];
